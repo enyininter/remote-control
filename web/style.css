@@ -1,0 +1,282 @@
+/* ── Reset & base ──────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0f0f13;
+  --surface:  #1a1a24;
+  --surface2: #23232f;
+  --accent:   #6c63ff;
+  --accent2:  #ff6584;
+  --text:     #e8e8f0;
+  --muted:    #888899;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --radius:   12px;
+  --tab-h:    48px;
+  --status-h: 40px;
+  /* altura fija de la zona de control inferior */
+  --ctrl-h:   170px;
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 15px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+/* ── Status bar ────────────────────────────────────────── */
+#statusBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--status-h);
+  padding: 0 14px;
+  background: var(--surface);
+  border-bottom: 1px solid #ffffff10;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+}
+.dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.dot.disconnected { background: var(--red); }
+.dot.connecting   { background: #facc15; animation: pulse 1s infinite; }
+.dot.connected    { background: var(--green); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+#statusText { flex:1; font-size:13px; color:var(--muted); }
+#btnFullscreen { background:none; border:none; color:var(--muted); font-size:18px; cursor:pointer; padding:4px; }
+
+/* ── Tabs ──────────────────────────────────────────────── */
+#tabs {
+  display: flex;
+  position: fixed;
+  top: var(--status-h); left: 0; right: 0;
+  height: var(--tab-h);
+  background: var(--surface);
+  border-bottom: 1px solid #ffffff10;
+  z-index: 99;
+}
+.tab {
+  flex:1; background:none; border:none; color:var(--muted);
+  font-size:13px; font-weight:600; cursor:pointer;
+  border-bottom:3px solid transparent; transition:color .2s,border-bottom .2s;
+}
+.tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+
+/* ── Content area ──────────────────────────────────────── */
+.tab-content {
+  display: none;
+  position: fixed;
+  top: calc(var(--status-h) + var(--tab-h));
+  left: 0; right: 0; bottom: 0;
+  overflow-y: auto;
+  padding: 10px;
+  gap: 8px;
+  flex-direction: column;
+}
+.tab-content.active { display: flex; }
+
+/* ══════════════════════════════════════════════════════════
+   PANTALLA TAB
+══════════════════════════════════════════════════════════ */
+
+/* Barra stream */
+#streamBar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #ffffff10;
+}
+#streamStatus { flex:1; font-size:12px; font-weight:700; white-space:nowrap; }
+.stream-off { color:var(--red); }
+.stream-on  { color:var(--green); }
+.stream-buf { color:#facc15; }
+.stream-toggle {
+  padding:6px 12px; border-radius:8px; border:none;
+  background:var(--accent); color:#fff;
+  font-size:13px; font-weight:700; cursor:pointer;
+  white-space:nowrap; touch-action:manipulation;
+}
+.stream-toggle.active    { background:var(--accent2); }
+.stream-toggle.reset-zoom{ background:var(--surface2); color:var(--muted); border:1.5px solid #ffffff20; }
+.stream-opt select {
+  background:var(--surface2); border:1px solid #ffffff15;
+  color:var(--text); border-radius:6px; padding:4px 6px;
+  font-size:12px; touch-action:manipulation;
+}
+
+/* Visor del escritorio */
+#screenWrap {
+  /* ocupa todo el espacio entre la barra y la zona de control */
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background: #111;
+  border-radius: var(--radius);
+  border: 2px solid #ffffff10;
+  touch-action: none;
+  isolation: isolate;
+  /* Centra el canvas manteniendo aspect ratio */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* El canvas mantiene sus dimensiones internas (SCREEN_W × SCREEN_H)
+   y se escala via CSS para caber en el contenedor SIN distorsión */
+#screenCanvas {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  touch-action: none;
+  will-change: transform;
+  image-rendering: auto;
+}
+
+#cursorDot {
+  position: absolute;
+  width: 16px; height: 16px;
+  border: 2.5px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #6c63ff99;
+  pointer-events: none;
+  transform: translate(-50%,-50%);
+  display: none;
+  z-index: 10;
+}
+
+/* ── Zona de control inferior ─────────────────────────── */
+#controlZone {
+  height: var(--ctrl-h);
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 2px solid #ffffff10;
+  padding: 10px 14px;
+}
+
+/* Botones de clic (columna izquierda) */
+#clickBtns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 6px;
+  width: 140px;
+  flex-shrink: 0;
+}
+.clic-btn {
+  padding: 0;
+  height: 60px;
+  border-radius: 10px;
+  border: 2px solid #ffffff12;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: background .12s, transform .08s;
+}
+.clic-btn span { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.clic-btn:active { background: var(--accent); transform: scale(.93); }
+#cbLeft  { border-color: #6c63ff44; }
+#cbRight { border-color: #ff658444; }
+
+/* Joystick (columna derecha, ocupa el resto) */
+#joystickWrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.joy-hint { font-size:11px; color:var(--muted); }
+
+#joystickBase {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #2a2a3a 60%, #1a1a24 100%);
+  border: 2.5px solid #ffffff18;
+  position: relative;
+  touch-action: none;
+  box-shadow: 0 4px 24px #0006, inset 0 2px 8px #ffffff08;
+}
+
+#joystickKnob {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #8b83ff, #6c63ff 60%, #4a43cc);
+  border: 2px solid #ffffff30;
+  box-shadow: 0 3px 12px #6c63ff88;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  transition: box-shadow .1s;
+  pointer-events: none;
+}
+#joystickBase.active #joystickKnob {
+  box-shadow: 0 4px 20px #6c63ffcc;
+}
+
+/* ── Teclado ───────────────────────────────────────────── */
+.type-row { display:flex; gap:6px; align-items:stretch; }
+#typeInput {
+  flex:1; padding:10px 14px; border-radius:var(--radius);
+  border:2px solid #ffffff15; background:var(--surface2);
+  color:var(--text); font-size:15px; outline:none; min-width:0;
+  touch-action:auto;
+}
+#typeInput:focus { border-color:var(--accent); }
+#btnSend,#btnClear {
+  padding:10px 14px; border-radius:var(--radius); border:none;
+  font-size:16px; font-weight:800; cursor:pointer; touch-action:manipulation;
+}
+#btnSend  { background:var(--accent); color:#fff; }
+#btnClear { background:var(--surface2); color:var(--muted); }
+
+.key-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; }
+.kbtn {
+  padding:12px 4px; border-radius:9px;
+  border:2px solid #ffffff10; background:var(--surface2);
+  color:var(--text); font-size:12px; font-weight:700;
+  cursor:pointer; text-align:center; touch-action:manipulation;
+  transition:background .12s, transform .1s;
+}
+.kbtn:active        { background:var(--accent); transform:scale(.94); }
+.kbtn.hotkey        { background:#1e1e2e; border-color:#ffffff18; }
+.kbtn.hotkey:active { background:var(--accent2); }
+.section-label {
+  font-size:11px; font-weight:700; color:var(--muted);
+  text-transform:uppercase; letter-spacing:1px; margin-top:4px;
+}
+
+/* ── Media ─────────────────────────────────────────────── */
+.media-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.mbig {
+  padding:22px 10px; border-radius:var(--radius);
+  border:2px solid #ffffff10; background:var(--surface2);
+  color:var(--text); font-size:22px; cursor:pointer;
+  touch-action:manipulation; transition:background .12s, transform .1s;
+}
+.mbig:active { background:var(--accent); transform:scale(.95); }
+.mbig.vol    { font-size:20px; }

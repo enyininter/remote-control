@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Remote Control</title>
+  <script src="config.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ── STATUS BAR ────────────────────────────────────────-->
+<div id="statusBar">
+  <span id="statusDot" class="dot disconnected"></span>
+  <span id="statusText">Conectando…</span>
+  <button id="btnFullscreen" title="Pantalla completa">⛶</button>
+</div>
+
+<!-- ── TABS ──────────────────────────────────────────────-->
+<nav id="tabs">
+  <button class="tab active" data-tab="screen">🖥️ Pantalla</button>
+  <button class="tab"        data-tab="keyboard">⌨️ Teclado</button>
+  <button class="tab"        data-tab="media">🎵 Media</button>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB: PANTALLA — stream arriba · joystick + clics abajo
+══════════════════════════════════════════════════════════-->
+<section id="tab-screen" class="tab-content active">
+
+  <!-- Barra de control del stream -->
+  <div id="streamBar">
+    <span id="streamStatus" class="stream-off">● Sin señal</span>
+    <button id="btnStream"    class="stream-toggle">▶ Iniciar</button>
+    <button id="btnResetZoom" class="stream-toggle reset-zoom">1:1</button>
+    <label class="stream-opt">
+      <select id="qualityMode">
+        <option value="low">Baja</option>
+        <option value="mid" selected>Media</option>
+        <option value="high">Alta</option>
+      </select>
+    </label>
+  </div>
+
+  <!-- Vista del escritorio (zoom/pan con 2 dedos) -->
+  <div id="screenWrap">
+    <canvas id="screenCanvas"></canvas>
+    <div id="cursorDot"></div>
+  </div>
+
+  <!-- ── ZONA DE CONTROL INFERIOR ─────────────────────── -->
+  <div id="controlZone">
+
+    <!-- Botones de clic a la izquierda -->
+    <div id="clickBtns">
+      <button class="clic-btn" id="cbLeft">◀<br><span>Izq</span></button>
+      <button class="clic-btn" id="cbRight">▶<br><span>Der</span></button>
+      <button class="clic-btn" id="cbScrlUp">▲<br><span>Scroll</span></button>
+      <button class="clic-btn" id="cbScrlDn">▼<br><span>Scroll</span></button>
+    </div>
+
+    <!-- Joystick virtual a la derecha -->
+    <div id="joystickWrap">
+      <div id="joystickBase">
+        <div id="joystickKnob"></div>
+      </div>
+      <p class="joy-hint">Mueve el cursor</p>
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB: TECLADO
+══════════════════════════════════════════════════════════-->
+<section id="tab-keyboard" class="tab-content">
+
+  <div class="type-row">
+    <input type="text" id="typeInput" placeholder="Escribe aquí y pulsa ↵" autocomplete="off" />
+    <button id="btnSend">↵</button>
+    <button id="btnClear">✕</button>
+  </div>
+
+  <div class="key-grid">
+    <button class="kbtn" data-key="esc">Esc</button>
+    <button class="kbtn" data-key="tab">Tab</button>
+    <button class="kbtn" data-key="backspace">⌫</button>
+    <button class="kbtn" data-key="delete">Del</button>
+    <button class="kbtn" data-key="enter">Enter</button>
+    <button class="kbtn" data-key="space">Espacio</button>
+    <button class="kbtn" data-key="up">↑</button>
+    <button class="kbtn" data-key="down">↓</button>
+    <button class="kbtn" data-key="left">←</button>
+    <button class="kbtn" data-key="right">→</button>
+    <button class="kbtn" data-key="home">Home</button>
+    <button class="kbtn" data-key="end">End</button>
+    <button class="kbtn" data-key="pageup">PgUp</button>
+    <button class="kbtn" data-key="pagedown">PgDn</button>
+    <button class="kbtn" data-key="f5">F5</button>
+    <button class="kbtn" data-key="f11">F11</button>
+  </div>
+
+  <p class="section-label">Atajos</p>
+  <div class="key-grid">
+    <button class="kbtn hotkey" data-keys='["ctrl","c"]'>Ctrl+C</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","v"]'>Ctrl+V</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","x"]'>Ctrl+X</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","z"]'>Ctrl+Z</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","a"]'>Ctrl+A</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","s"]'>Ctrl+S</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","w"]'>Ctrl+W</button>
+    <button class="kbtn hotkey" data-keys='["alt","tab"]'>Alt+Tab</button>
+    <button class="kbtn hotkey" data-keys='["alt","f4"]'>Alt+F4</button>
+    <button class="kbtn hotkey" data-keys='["super"]'>Win/Super</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","alt","t"]'>Terminal</button>
+    <button class="kbtn hotkey" data-keys='["ctrl","shift","esc"]'>Task Mgr</button>
+  </div>
+
+</section>
+
+<!-- ══════════════════════════════════════════════════════
+     TAB: MEDIA
+══════════════════════════════════════════════════════════-->
+<section id="tab-media" class="tab-content">
+
+  <div class="media-grid">
+    <button class="mbig" data-key="prevtrack">⏮</button>
+    <button class="mbig" data-key="playpause">⏯</button>
+    <button class="mbig" data-key="nexttrack">⏭</button>
+    <button class="mbig" data-key="volumemute">🔇</button>
+    <button class="mbig vol" data-key="volumedown">🔉</button>
+    <button class="mbig vol" data-key="volumeup">🔊</button>
+  </div>
+
+  <p class="section-label">Sistema</p>
+  <div class="media-grid">
+    <button class="mbig" data-hotkey='["super","l"]'>🔒 Bloquear</button>
+    <button class="mbig" data-key="printscreen">📷 Screen</button>
+  </div>
+
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>

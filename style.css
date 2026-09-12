@@ -282,9 +282,9 @@ html, body {
 .mbig.vol    { font-size:20px; }
 
 /* ══════════════════════════════════════════════════════════
-   SETUP SCREEN
+   PAIR SCREEN — código de 6 dígitos
 ══════════════════════════════════════════════════════════ */
-#setupScreen {
+#pairScreen {
   position: fixed;
   inset: 0;
   background: var(--bg);
@@ -295,88 +295,97 @@ html, body {
   padding: 20px;
 }
 
-#setupCard {
+#pairCard {
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   background: var(--surface);
-  border-radius: 18px;
+  border-radius: 20px;
   border: 1.5px solid #ffffff12;
-  padding: 28px 24px 24px;
+  padding: 32px 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  gap: 18px;
 }
 
-#setupCard h1 {
-  font-size: 22px;
+.pair-icon { font-size: 48px; line-height: 1; }
+
+#pairCard h1 {
+  font-size: 24px;
   font-weight: 800;
   color: var(--text);
-  text-align: center;
+  margin: 0;
 }
 
-.setup-sub {
-  font-size: 13px;
+.pair-sub {
+  font-size: 14px;
   color: var(--muted);
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-.setup-label {
+/* Inputs de dígitos */
+#codeInputs {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: .5px;
+  align-items: center;
+  gap: 8px;
 }
 
-.setup-label input {
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 2px solid #ffffff15;
+.digit {
+  width: 46px;
+  height: 58px;
+  border-radius: 12px;
+  border: 2px solid #ffffff18;
   background: var(--surface2);
   color: var(--text);
-  font-size: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
   outline: none;
+  caret-color: var(--accent);
   touch-action: auto;
+  transition: border-color .15s;
+}
+
+.digit:focus { border-color: var(--accent); box-shadow: 0 0 0 3px #6c63ff33; }
+
+.digit-sep {
+  font-size: 22px;
+  color: var(--muted);
+  user-select: none;
+  margin: 0 2px;
+}
+
+#btnPair {
   width: 100%;
-}
-
-.setup-label input:focus { border-color: var(--accent); }
-
-.setup-row {
-  display: flex;
-  gap: 10px;
-}
-
-.setup-label.half { flex: 1; }
-.setup-label.half input { font-size: 14px; }
-
-#btnConnect {
-  padding: 14px;
+  padding: 15px;
   border-radius: 12px;
   border: none;
   background: var(--accent);
   color: #fff;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 800;
   cursor: pointer;
   touch-action: manipulation;
-  margin-top: 4px;
+  transition: opacity .15s;
 }
 
-#btnConnect:active { opacity: .85; }
+#btnPair:active   { opacity: .85; }
+#btnPair:disabled { opacity: .5; cursor: default; }
 
-.setup-error {
+.pair-error {
   font-size: 13px;
   color: var(--red);
   text-align: center;
   min-height: 18px;
 }
 
-/* Botón de configuración en statusBar */
+.pair-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Botón ⚙️ en statusBar */
 #btnSettings {
   background: none;
   border: none;

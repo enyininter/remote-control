@@ -11,9 +11,12 @@ import io
 import json
 import os
 import queue
+import random
 import socket
 import threading
 import time
+import urllib.request
+import urllib.error
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
 
@@ -25,9 +28,12 @@ WEB_PORT    = 8080
 WS_PORT     = 8765
 STREAM_PORT = 8766
 
-STREAM_FPS     = 5     # pocos fps pero cada frame es nítido
-STREAM_QUALITY = 78    # JPEG calidad alta — sin artefactos
-STREAM_SCALE   = 1.0   # resolución completa, sin escalar
+STREAM_FPS     = 5
+STREAM_QUALITY = 78
+STREAM_SCALE   = 1.0
+
+# URL de la API de Vercel — ajusta si tu dominio es diferente
+VERCEL_API = "https://remote-control-enyininter.vercel.app/api/pair"
 
 WEB_DIR = Path(__file__).parent / "web"
 os.environ.setdefault("DISPLAY", ":0")
@@ -243,44 +249,85 @@ def get_local_ip():
     except: return "127.0.0.1"
     finally: s.close()
 
+def generate_code():
+    """Genera un código de 6 dígitos y lo registra en la API de Vercel."""
+    code = f"{random.randint(0, 999999):06d}"
+    ip   = get_local_ip()
+    payload = json.dumps({
+        "code":        code,
+        "ip":          ip,
+        "ws_port":     WS_PORT,
+        "stream_port": STREAM_PORT,
+        "screen_w":    _screen.width_in_pixels,
+        "screen_h":    _screen.height_in_pixels,
+    }).encode()
+    try:
+        req = urllib.request.Request(
+            VERCEL_API, data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        urllib.request.urlopen(req, timeout=8)
+        return code, ip
+    except Exception as e:
+        print(f"  ⚠️  No se pudo registrar el código: {e}")
+        return code, ip
+
+def delete_code(code):
+    try:
+        req = urllib.request.Request(
+            f"{VERCEL_API}?code={code}", method="DELETE"
+        )
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
+
 def inject_config(ip):
-    (WEB_DIR / "config.js").write_text(
-        f'window.SERVER_IP   = "{ip}";\n'
-        f'window.WS_PORT     = {WS_PORT};\n'
-        f'window.STREAM_PORT = {STREAM_PORT};\n'
-        f'window.SCREEN_W    = {_screen.width_in_pixels};\n'
-        f'window.SCREEN_H    = {_screen.height_in_pixels};\n'
-    )
+    config = Path(__file__).parent / "web" / "config.js"
+    if config.exists():
+        config.write_text(
+            f'window.SERVER_IP   = "{ip}";\n'
+            f'window.WS_PORT     = {WS_PORT};\n'
+            f'window.STREAM_PORT = {STREAM_PORT};\n'
+            f'window.SCREEN_W    = {_screen.width_in_pixels};\n'
+            f'window.SCREEN_H    = {_screen.height_in_pixels};\n'
+        )
 
 
 # ── Main ───────────────────────────────────────────────────
 
 async def main():
-    ip = get_local_ip()
+    code, ip = generate_code()
     inject_config(ip)
 
-    # HTTP en hilo daemon
     threading.Thread(target=start_http, daemon=True).start()
-    # Captura de pantalla en hilo daemon dedicado
     threading.Thread(target=capture_thread, daemon=True).start()
 
     print("=" * 52)
     print("  🖥️   Remote Control Server")
     print("=" * 52)
     print(f"  IP local:    {ip}")
-    print(f"  Web:         http://{ip}:{WEB_PORT}")
+    print(f"  Web local:   http://{ip}:{WEB_PORT}")
     print(f"  Control WS:  ws://{ip}:{WS_PORT}")
     print(f"  Stream WS:   ws://{ip}:{STREAM_PORT}")
     print(f"  Resolución:  {_screen.width_in_pixels}x{_screen.height_in_pixels}")
-    print(f"  Stream:      {STREAM_FPS}fps · Q{STREAM_QUALITY} · {STREAM_SCALE}x")
     print("-" * 52)
-    print("  Abre la URL en tu teléfono (misma red WiFi)")
+    print(f"  📱 CÓDIGO DE EMPAREJAMIENTO:")
+    print()
+    print(f"       {'  '.join(list(code))}")
+    print()
+    print(f"  Ingresa este código en la app del celular")
+    print(f"  Expira en 10 minutos")
+    print("-" * 52)
     print("  Ctrl+C para detener")
     print("=" * 52)
 
-    async with websockets.serve(ws_control, "0.0.0.0", WS_PORT):
-        async with websockets.serve(ws_stream, "0.0.0.0", STREAM_PORT):
-            await broadcast_loop()
+    try:
+        async with websockets.serve(ws_control, "0.0.0.0", WS_PORT):
+            async with websockets.serve(ws_stream, "0.0.0.0", STREAM_PORT):
+                await broadcast_loop()
+    finally:
+        delete_code(code)
 
 
 if __name__ == "__main__":

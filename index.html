@@ -12,28 +12,27 @@
 <body>
 
 <!-- ══════════════════════════════════════════════════════
-     PANTALLA DE CONFIGURACIÓN (visible cuando no hay IP guardada)
+     PANTALLA DE EMPAREJAMIENTO (código de 6 dígitos)
 ══════════════════════════════════════════════════════════-->
-<div id="setupScreen">
-  <div id="setupCard">
-    <h1>🖥️ Remote Control</h1>
-    <p class="setup-sub">Ingresa la IP de tu PC en la red local<br>para conectarte desde cualquier lugar</p>
+<div id="pairScreen">
+  <div id="pairCard">
+    <div class="pair-icon">🖥️</div>
+    <h1>Remote Control</h1>
+    <p class="pair-sub">Ingresa el código que aparece<br>en la terminal de tu PC</p>
 
-    <label class="setup-label">IP o hostname del PC
-      <input type="text" id="cfgIP" placeholder="192.168.1.x  ó  mi-pc.local" autocomplete="off" autocorrect="off" spellcheck="false" />
-    </label>
-
-    <div class="setup-row">
-      <label class="setup-label half">Puerto control
-        <input type="number" id="cfgWsPort" value="8765" />
-      </label>
-      <label class="setup-label half">Puerto stream
-        <input type="number" id="cfgStPort" value="8766" />
-      </label>
+    <div id="codeInputs">
+      <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      <span class="digit-sep">—</span>
+      <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+      <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
     </div>
 
-    <button id="btnConnect">Conectar →</button>
-    <p id="setupError" class="setup-error"></p>
+    <button id="btnPair">Conectar →</button>
+    <p id="pairError" class="pair-error"></p>
+    <p class="pair-hint">El código expira en 10 minutos</p>
   </div>
 </div>
 
@@ -41,7 +40,7 @@
 <div id="statusBar" style="display:none">
   <span id="statusDot" class="dot disconnected"></span>
   <span id="statusText">Conectando…</span>
-  <button id="btnSettings" title="Configuración">⚙️</button>
+  <button id="btnSettings" title="Cambiar código">⚙️</button>
   <button id="btnFullscreen" title="Pantalla completa">⛶</button>
 </div>
 
@@ -83,9 +82,7 @@
       <button class="clic-btn" id="cbScrlDn">▼<br><span>Scroll</span></button>
     </div>
     <div id="joystickWrap">
-      <div id="joystickBase">
-        <div id="joystickKnob"></div>
-      </div>
+      <div id="joystickBase"><div id="joystickKnob"></div></div>
       <p class="joy-hint">Mueve el cursor</p>
     </div>
   </div>

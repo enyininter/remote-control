@@ -282,7 +282,7 @@ def delete_code(code):
     except Exception:
         pass
 
-def inject_config(ip):
+def inject_config(ip, code):
     config = Path(__file__).parent / "web" / "config.js"
     if config.exists():
         config.write_text(
@@ -291,6 +291,7 @@ def inject_config(ip):
             f'window.STREAM_PORT = {STREAM_PORT};\n'
             f'window.SCREEN_W    = {_screen.width_in_pixels};\n'
             f'window.SCREEN_H    = {_screen.height_in_pixels};\n'
+            f'window.PAIR_CODE   = "{code}";\n'   # código visible en el PC
         )
 
 
@@ -298,7 +299,7 @@ def inject_config(ip):
 
 async def main():
     code, ip = generate_code()
-    inject_config(ip)
+    inject_config(ip, code)
 
     threading.Thread(target=start_http, daemon=True).start()
     threading.Thread(target=capture_thread, daemon=True).start()

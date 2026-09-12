@@ -323,8 +323,6 @@ html, body {
   text-align: center;
   line-height: 1.6;
 }
-
-/* Inputs de dígitos */
 #codeInputs {
   display: flex;
   align-items: center;
@@ -394,3 +392,51 @@ html, body {
   cursor: pointer;
   padding: 4px;
 }
+
+/* ── Modo PC: card con display del código ── */
+.pair-card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border-radius: 20px;
+  border: 1.5px solid #ffffff12;
+  padding: 32px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+#codeDisplay {
+  background: var(--surface2);
+  border-radius: 16px;
+  border: 2px solid #6c63ff44;
+  padding: 20px 24px;
+  text-align: center;
+  width: 100%;
+}
+
+#codeDigits {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  font-size: 52px;
+  font-weight: 900;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 4px;
+}
+
+.btn-secondary {
+  padding: 11px 20px;
+  border-radius: 10px;
+  border: 1.5px solid #ffffff18;
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  touch-action: manipulation;
+  width: 100%;
+}
+.btn-secondary:active { background: var(--surface); color: var(--text); }

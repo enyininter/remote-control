@@ -12,14 +12,29 @@
 <body>
 
 <!-- ══════════════════════════════════════════════════════
-     PANTALLA DE EMPAREJAMIENTO (código de 6 dígitos)
+     PANTALLA DE EMPAREJAMIENTO
+     · Modo PC (localhost): muestra el código generado
+     · Modo celular (Vercel): muestra el input para ingresarlo
 ══════════════════════════════════════════════════════════-->
 <div id="pairScreen">
-  <div id="pairCard">
+
+  <!-- MODO PC: muestra el código -->
+  <div id="pcCard" class="pair-card" style="display:none">
     <div class="pair-icon">🖥️</div>
     <h1>Remote Control</h1>
-    <p class="pair-sub">Ingresa el código que aparece<br>en la terminal de tu PC</p>
+    <p class="pair-sub">Abre la app en tu celular e ingresa este código</p>
+    <div id="codeDisplay">
+      <span id="codeDigits"></span>
+    </div>
+    <p class="pair-hint" id="codeExpiry">Expira en <b id="countdown">10:00</b></p>
+    <button id="btnNewCode" class="btn-secondary">🔄 Nuevo código</button>
+  </div>
 
+  <!-- MODO CELULAR: input de código -->
+  <div id="phoneCard" class="pair-card" style="display:none">
+    <div class="pair-icon">📱</div>
+    <h1>Remote Control</h1>
+    <p class="pair-sub">Ingresa el código que aparece<br>en la pantalla de tu PC</p>
     <div id="codeInputs">
       <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
       <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
@@ -29,11 +44,11 @@
       <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
       <input class="digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]" />
     </div>
-
     <button id="btnPair">Conectar →</button>
     <p id="pairError" class="pair-error"></p>
     <p class="pair-hint">El código expira en 10 minutos</p>
   </div>
+
 </div>
 
 <!-- ── STATUS BAR ────────────────────────────────────────-->

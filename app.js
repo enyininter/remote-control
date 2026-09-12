@@ -2,6 +2,66 @@
    Remote Control – app.js
 ══════════════════════════════════════════════════════════ */
 
+// ── Pantalla de configuración ─────────────────────────────
+// Si no hay IP guardada (modo Vercel/remoto), muestra el setup.
+// Si el servidor local ya inyectó config.js con la IP, entra directo.
+
+const setupScreen = document.getElementById("setupScreen");
+const statusBar   = document.getElementById("statusBar");
+const tabsNav     = document.getElementById("tabs");
+
+function showApp() {
+  setupScreen.style.display = "none";
+  statusBar.style.display   = "flex";
+  tabsNav.style.display     = "flex";
+  document.querySelectorAll(".tab-content").forEach(s => {
+    if (s.classList.contains("active")) s.style.display = "flex";
+  });
+}
+
+function showSetup(err) {
+  setupScreen.style.display = "flex";
+  statusBar.style.display   = "none";
+  tabsNav.style.display     = "none";
+  document.querySelectorAll(".tab-content").forEach(s => s.style.display = "none");
+  if (err) document.getElementById("setupError").textContent = err;
+}
+
+// Prefill con valores guardados
+const _saved = JSON.parse(localStorage.getItem("rc_config") || "{}");
+if (_saved.SERVER_IP) document.getElementById("cfgIP").value       = _saved.SERVER_IP;
+document.getElementById("cfgWsPort").value = _saved.WS_PORT     || 8765;
+document.getElementById("cfgStPort").value = _saved.STREAM_PORT || 8766;
+
+document.getElementById("btnConnect").addEventListener("click", () => {
+  const ip = document.getElementById("cfgIP").value.trim();
+  if (!ip) { document.getElementById("setupError").textContent = "Ingresa la IP del PC"; return; }
+  const cfg = {
+    SERVER_IP:   ip,
+    WS_PORT:     parseInt(document.getElementById("cfgWsPort").value) || 8765,
+    STREAM_PORT: parseInt(document.getElementById("cfgStPort").value) || 8766,
+    SCREEN_W:    window.SCREEN_W || 1366,
+    SCREEN_H:    window.SCREEN_H || 768,
+  };
+  localStorage.setItem("rc_config", JSON.stringify(cfg));
+  // Recarga para que config.js tome los nuevos valores
+  location.reload();
+});
+
+// Botón ⚙️ para volver al setup
+document.getElementById("btnSettings").addEventListener("click", () => {
+  localStorage.removeItem("rc_config");
+  location.reload();
+});
+
+// Decide si mostrar setup o app al cargar
+if (!window.SERVER_IP) {
+  showSetup();
+} else {
+  showApp();
+}
+
+// ── Valores efectivos de conexión ─────────────────────────
 const SERVER_IP   = window.SERVER_IP   || location.hostname;
 const WS_PORT     = window.WS_PORT     || 8765;
 const STREAM_PORT = window.STREAM_PORT || 8766;

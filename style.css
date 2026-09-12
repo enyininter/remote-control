@@ -280,3 +280,108 @@ html, body {
 }
 .mbig:active { background:var(--accent); transform:scale(.95); }
 .mbig.vol    { font-size:20px; }
+
+/* ══════════════════════════════════════════════════════════
+   SETUP SCREEN
+══════════════════════════════════════════════════════════ */
+#setupScreen {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 20px;
+}
+
+#setupCard {
+  width: 100%;
+  max-width: 400px;
+  background: var(--surface);
+  border-radius: 18px;
+  border: 1.5px solid #ffffff12;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+#setupCard h1 {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  text-align: center;
+}
+
+.setup-sub {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.setup-label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.setup-label input {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 2px solid #ffffff15;
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  touch-action: auto;
+  width: 100%;
+}
+
+.setup-label input:focus { border-color: var(--accent); }
+
+.setup-row {
+  display: flex;
+  gap: 10px;
+}
+
+.setup-label.half { flex: 1; }
+.setup-label.half input { font-size: 14px; }
+
+#btnConnect {
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  margin-top: 4px;
+}
+
+#btnConnect:active { opacity: .85; }
+
+.setup-error {
+  font-size: 13px;
+  color: var(--red);
+  text-align: center;
+  min-height: 18px;
+}
+
+/* Botón de configuración en statusBar */
+#btnSettings {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}

@@ -11,26 +11,52 @@
 </head>
 <body>
 
+<!-- ══════════════════════════════════════════════════════
+     PANTALLA DE CONFIGURACIÓN (visible cuando no hay IP guardada)
+══════════════════════════════════════════════════════════-->
+<div id="setupScreen">
+  <div id="setupCard">
+    <h1>🖥️ Remote Control</h1>
+    <p class="setup-sub">Ingresa la IP de tu PC en la red local<br>para conectarte desde cualquier lugar</p>
+
+    <label class="setup-label">IP o hostname del PC
+      <input type="text" id="cfgIP" placeholder="192.168.1.x  ó  mi-pc.local" autocomplete="off" autocorrect="off" spellcheck="false" />
+    </label>
+
+    <div class="setup-row">
+      <label class="setup-label half">Puerto control
+        <input type="number" id="cfgWsPort" value="8765" />
+      </label>
+      <label class="setup-label half">Puerto stream
+        <input type="number" id="cfgStPort" value="8766" />
+      </label>
+    </div>
+
+    <button id="btnConnect">Conectar →</button>
+    <p id="setupError" class="setup-error"></p>
+  </div>
+</div>
+
 <!-- ── STATUS BAR ────────────────────────────────────────-->
-<div id="statusBar">
+<div id="statusBar" style="display:none">
   <span id="statusDot" class="dot disconnected"></span>
   <span id="statusText">Conectando…</span>
+  <button id="btnSettings" title="Configuración">⚙️</button>
   <button id="btnFullscreen" title="Pantalla completa">⛶</button>
 </div>
 
 <!-- ── TABS ──────────────────────────────────────────────-->
-<nav id="tabs">
+<nav id="tabs" style="display:none">
   <button class="tab active" data-tab="screen">🖥️ Pantalla</button>
   <button class="tab"        data-tab="keyboard">⌨️ Teclado</button>
   <button class="tab"        data-tab="media">🎵 Media</button>
 </nav>
 
 <!-- ══════════════════════════════════════════════════════
-     TAB: PANTALLA — stream arriba · joystick + clics abajo
+     TAB: PANTALLA
 ══════════════════════════════════════════════════════════-->
-<section id="tab-screen" class="tab-content active">
+<section id="tab-screen" class="tab-content active" style="display:none">
 
-  <!-- Barra de control del stream -->
   <div id="streamBar">
     <span id="streamStatus" class="stream-off">● Sin señal</span>
     <button id="btnStream"    class="stream-toggle">▶ Iniciar</button>
@@ -44,31 +70,24 @@
     </label>
   </div>
 
-  <!-- Vista del escritorio (zoom/pan con 2 dedos) -->
   <div id="screenWrap">
     <canvas id="screenCanvas"></canvas>
     <div id="cursorDot"></div>
   </div>
 
-  <!-- ── ZONA DE CONTROL INFERIOR ─────────────────────── -->
   <div id="controlZone">
-
-    <!-- Botones de clic a la izquierda -->
     <div id="clickBtns">
       <button class="clic-btn" id="cbLeft">◀<br><span>Izq</span></button>
       <button class="clic-btn" id="cbRight">▶<br><span>Der</span></button>
       <button class="clic-btn" id="cbScrlUp">▲<br><span>Scroll</span></button>
       <button class="clic-btn" id="cbScrlDn">▼<br><span>Scroll</span></button>
     </div>
-
-    <!-- Joystick virtual a la derecha -->
     <div id="joystickWrap">
       <div id="joystickBase">
         <div id="joystickKnob"></div>
       </div>
       <p class="joy-hint">Mueve el cursor</p>
     </div>
-
   </div>
 
 </section>
@@ -76,7 +95,7 @@
 <!-- ══════════════════════════════════════════════════════
      TAB: TECLADO
 ══════════════════════════════════════════════════════════-->
-<section id="tab-keyboard" class="tab-content">
+<section id="tab-keyboard" class="tab-content" style="display:none">
 
   <div class="type-row">
     <input type="text" id="typeInput" placeholder="Escribe aquí y pulsa ↵" autocomplete="off" />
@@ -124,7 +143,7 @@
 <!-- ══════════════════════════════════════════════════════
      TAB: MEDIA
 ══════════════════════════════════════════════════════════-->
-<section id="tab-media" class="tab-content">
+<section id="tab-media" class="tab-content" style="display:none">
 
   <div class="media-grid">
     <button class="mbig" data-key="prevtrack">⏮</button>

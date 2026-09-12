@@ -35,7 +35,7 @@ STREAM_SCALE   = 1.0
 # URL de la API de Vercel — ajusta si tu dominio es diferente
 VERCEL_API = "https://remote-control-enyininter.vercel.app/api/pair"
 
-WEB_DIR = Path(__file__).parent / "web"
+WEB_DIR = Path(__file__).parent
 os.environ.setdefault("DISPLAY", ":0")
 
 # ── Backend X11 ────────────────────────────────────────────
@@ -283,16 +283,16 @@ def delete_code(code):
         pass
 
 def inject_config(ip, code):
-    config = Path(__file__).parent / "web" / "config.js"
-    if config.exists():
-        config.write_text(
-            f'window.SERVER_IP   = "{ip}";\n'
-            f'window.WS_PORT     = {WS_PORT};\n'
-            f'window.STREAM_PORT = {STREAM_PORT};\n'
-            f'window.SCREEN_W    = {_screen.width_in_pixels};\n'
-            f'window.SCREEN_H    = {_screen.height_in_pixels};\n'
-            f'window.PAIR_CODE   = "{code}";\n'   # código visible en el PC
-        )
+    # Escribe en la raíz del proyecto (donde está config.js para Vercel)
+    config = Path(__file__).parent / "config.js"
+    config.write_text(
+        f'window.SERVER_IP   = "{ip}";\n'
+        f'window.WS_PORT     = {WS_PORT};\n'
+        f'window.STREAM_PORT = {STREAM_PORT};\n'
+        f'window.SCREEN_W    = {_screen.width_in_pixels};\n'
+        f'window.SCREEN_H    = {_screen.height_in_pixels};\n'
+        f'window.PAIR_CODE   = "{code}";\n'
+    )
 
 
 # ── Main ───────────────────────────────────────────────────
@@ -303,25 +303,6 @@ async def main():
 
     threading.Thread(target=start_http, daemon=True).start()
     threading.Thread(target=capture_thread, daemon=True).start()
-
-    print("=" * 52)
-    print("  🖥️   Remote Control Server")
-    print("=" * 52)
-    print(f"  IP local:    {ip}")
-    print(f"  Web local:   http://{ip}:{WEB_PORT}")
-    print(f"  Control WS:  ws://{ip}:{WS_PORT}")
-    print(f"  Stream WS:   ws://{ip}:{STREAM_PORT}")
-    print(f"  Resolución:  {_screen.width_in_pixels}x{_screen.height_in_pixels}")
-    print("-" * 52)
-    print(f"  📱 CÓDIGO DE EMPAREJAMIENTO:")
-    print()
-    print(f"       {'  '.join(list(code))}")
-    print()
-    print(f"  Ingresa este código en la app del celular")
-    print(f"  Expira en 10 minutos")
-    print("-" * 52)
-    print("  Ctrl+C para detener")
-    print("=" * 52)
 
     try:
         async with websockets.serve(ws_control, "0.0.0.0", WS_PORT):
@@ -335,4 +316,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("\n  👋 Servidor detenido.")
+        pass

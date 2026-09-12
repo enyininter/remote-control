@@ -33,7 +33,7 @@ STREAM_QUALITY = 78
 STREAM_SCALE   = 1.0
 
 # URL de la API de Vercel — ajusta si tu dominio es diferente
-VERCEL_API = "https://remote-control-enyininter.vercel.app/api/pair"
+VERCEL_API = "https://remote-control-gamma.vercel.app/api/pair"
 
 WEB_DIR = Path(__file__).parent
 os.environ.setdefault("DISPLAY", ":0")
